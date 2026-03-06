@@ -1,0 +1,90 @@
+@model ECommerce.PL.Models.ViewModels.OrderDetailsVM
+@{
+    ViewData["Title"] = $"Order #{Model.Id}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-receipt"></i> Order #@Model.Id</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Orders
+    </a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Order Items</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Unit Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId">
+                                        @item.ProductName
+                                    </a>
+                                </td>
+                                <td>$@item.UnitPrice.ToString("0.00")</td>
+                                <td>@item.Quantity</td>
+                                <td class="fw-bold">$@item.SubTotal.ToString("0.00")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold">Total:</td>
+                            <td class="fw-bold text-primary h5 mb-0">$@Model.TotalAmount.ToString("0.00")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header">
+                <h6 class="mb-0">Order Info</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Date:</strong> @Model.OrderDate.ToString("MMM dd, yyyy HH:mm")</p>
+                <p><strong>Status:</strong>
+                    <span class="badge badge-status-@Model.Status">@Model.StatusDisplay</span>
+                </p>
+                @if (!string.IsNullOrEmpty(Model.Notes))
+                {
+                    <p><strong>Notes:</strong> @Model.Notes</p>
+                }
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-geo-alt"></i> Shipping Address</h6>
+            </div>
+            <div class="card-body">
+                <address class="mb-0">
+                    <strong>@Model.ShippingAddress.FullName</strong><br />
+                    @Model.ShippingAddress.Street<br />
+                    @Model.ShippingAddress.City, @Model.ShippingAddress.State @Model.ShippingAddress.PostalCode<br />
+                    @Model.ShippingAddress.Country
+                    @if (!string.IsNullOrEmpty(Model.ShippingAddress.Phone))
+                    {
+                        <br /><i class="bi bi-telephone"></i> @Model.ShippingAddress.Phone
+                    }
+                </address>
+            </div>
+        </div>
+    </div>
+</div>
