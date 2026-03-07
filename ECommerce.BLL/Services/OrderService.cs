@@ -66,6 +66,31 @@ namespace ECommerce.BLL.Services
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
 
+        public async Task<PagedResult<Order>> GetUserOrdersPagedAsync(string userId, int page, int pageSize)
+        {
+            var query = _unitOfWork.Orders.Query()
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .Include(o => o.ShippingAddress)
+                .Where(o => o.UserId == userId)
+                .OrderByDescending(o => o.OrderDate);
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<Order>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+
         public async Task<Order?> GetOrderDetailsAsync(int orderId, string userId)
             => await _unitOfWork.Orders.Query()
                 .Include(o => o.OrderItems)

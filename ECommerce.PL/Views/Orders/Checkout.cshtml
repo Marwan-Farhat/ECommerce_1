@@ -3,17 +3,72 @@
     ViewData["Title"] = "Checkout";
 }
 
-<div class="mb-4">
-    <h2 class="fw-bold"><i class="bi bi-credit-card text-primary"></i> Checkout</h2>
-    <p class="text-muted">Complete your order below</p>
+
+<style>
+    .selected-addr {
+        border-color: #6366f1 !important;
+        background: #fafaff;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+        border-color: #6366f1;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function toggleNewAddress(cb) {
+            const form = document.getElementById('newAddressForm');
+            form.classList.toggle('d-none', !cb.checked);
+        }
+
+        function selectAddress(card) {
+            document.querySelectorAll('.address-card').forEach(c => {
+                c.classList.remove('selected-addr');
+            });
+            card.classList.add('selected-addr');
+        }
+
+        document.querySelectorAll('input[name="SelectedAddressId"]:checked').forEach(r => {
+            r.closest('.address-card')?.classList.add('selected-addr');
+        });
+    </script>
+} 
+
+<div class="d-flex align-items-center justify-content-center gap-0 mb-5">
+    <div class="d-flex align-items-center gap-2">
+        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
+             style="width:36px; height:36px; background:#6366f1; font-size:0.85rem;">
+            1
+        </div>
+        <span class="fw-semibold small" style="color:#6366f1;">Shipping</span>
+    </div>
+    <div style="width:60px; height:2px; background:#e2e8f0;" class="mx-2"></div>
+    <div class="d-flex align-items-center gap-2">
+        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
+             style="width:36px; height:36px; background:#cbd5e1; font-size:0.85rem;">
+            2
+        </div>
+        <span class="fw-semibold small text-muted">Review</span>
+    </div>
+    <div style="width:60px; height:2px; background:#e2e8f0;" class="mx-2"></div>
+    <div class="d-flex align-items-center gap-2">
+        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
+             style="width:36px; height:36px; background:#cbd5e1; font-size:0.85rem;">
+            3
+        </div>
+        <span class="fw-semibold small text-muted">Confirm</span>
+    </div>
 </div>
 
 <form asp-action="Checkout" method="post">
     <div class="row g-4">
+        <!-- Shipping Address -->
         <div class="col-lg-7">
-            <div class="card shadow-sm">
-                <div class="card-header border-0 py-3"
-                     style="background: linear-gradient(135deg, #6366f1, #4f46e5);">
+            <div class="card shadow-sm" style="border-radius:20px;">
+                <div class="card-header border-0 py-3 px-4"
+                     style="background:linear-gradient(135deg,#6366f1,#4f46e5); border-radius:20px 20px 0 0;">
                     <h5 class="mb-0 text-white fw-bold">
                         <i class="bi bi-geo-alt-fill me-2"></i> Shipping Address
                     </h5>
@@ -21,30 +76,47 @@
                 <div class="card-body p-4">
                     @if (Model.SavedAddresses.Any())
                     {
-                        <p class="fw-semibold text-muted mb-3">Select a saved address:</p>
+                        <p class="fw-semibold mb-3" style="color:#1e1b4b;">
+                            Select a saved address:
+                        </p>
                         @foreach (var addr in Model.SavedAddresses)
                         {
-                            <div class="form-check p-3 mb-2 border rounded-3"
-                                 style="cursor:pointer; transition: all 0.2s;"
-                                 onmouseover="this.style.borderColor='#6366f1'"
-                                 onmouseout="this.style.borderColor='#dee2e6'">
-                                <input class="form-check-input" type="radio"
-                                       name="SelectedAddressId" id="addr_@addr.Id"
-                                       value="@addr.Id" checked="@(addr.IsDefault)" />
-                                <label class="form-check-label w-100" for="addr_@addr.Id">
-                                    <span class="fw-bold">@addr.FullName</span>
-                                    <span class="text-muted d-block small mt-1">
-                                        @addr.Street, @addr.City, @addr.State @addr.PostalCode, @addr.Country
-                                    </span>
-                                </label>
-                            </div>
+                            <label class="d-block mb-3 cursor-pointer" for="addr_@addr.Id">
+                                <div class="p-3 border rounded-3 address-card @(addr.IsDefault ? "selected-addr" : "")"
+                                     style="cursor:pointer; transition:all 0.2s;">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <input class="form-check-input mt-1" type="radio"
+                                               name="SelectedAddressId" id="addr_@addr.Id"
+                                               value="@addr.Id" checked="@(addr.IsDefault)"
+                                               onchange="selectAddress(this.closest('.address-card'))" />
+                                        <div>
+                                            <p class="fw-bold mb-1" style="color:#1e1b4b;">
+                                                @addr.FullName
+                                                @if (addr.IsDefault)
+                                                {
+                                                    <span class="badge ms-2 fw-normal"
+                                                          style="background:#ede9fe; color:#5b21b6; font-size:0.7rem;">
+                                                        Default
+                                                    </span>
+                                                }
+                                            </p>
+                                            <p class="text-muted small mb-0">
+                                                @addr.Street, @addr.City, @addr.State @addr.PostalCode, @addr.Country
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
                         }
-                        <hr />
-                        <div class="form-check p-2">
-                            <input class="form-check-input" type="checkbox"
-                                   name="UseNewAddress" id="useNew" value="true" />
-                            <label class="form-check-label fw-semibold text-primary" for="useNew">
-                                <i class="bi bi-plus-circle me-1"></i> Use a new address
+                        <div class="mt-2">
+                            <label class="d-flex align-items-center gap-2 p-3 border rounded-3"
+                                   style="cursor:pointer; border-style:dashed !important;">
+                                <input class="form-check-input" type="checkbox"
+                                       name="UseNewAddress" id="useNew" value="true"
+                                       onchange="toggleNewAddress(this)" />
+                                <span class="fw-semibold" style="color:#6366f1;">
+                                    <i class="bi bi-plus-circle me-1"></i> Use a new address
+                                </span>
                             </label>
                         </div>
                     }
@@ -54,42 +126,75 @@
                     }
 
                     <div id="newAddressForm" class="mt-4 @(!Model.SavedAddresses.Any() ? "" : "d-none")">
+                        @if (Model.SavedAddresses.Any())
+                        {
+                            <hr style="border-color:#e2e8f0;" />
+                            <p class="fw-semibold mb-3" style="color:#1e1b4b;">New Address</p>
+                        }
                         <div class="row g-3">
                             <div class="col-12">
-                                <label class="form-label fw-semibold">Full Name</label>
-                                <input asp-for="NewAddress.FullName" class="form-control" placeholder="John Doe" />
+                                <label class="form-label fw-semibold small text-uppercase"
+                                       style="letter-spacing:0.5px; color:#64748b;">Full Name</label>
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text border-0 bg-light">
+                                        <i class="bi bi-person" style="color:#6366f1;"></i>
+                                    </span>
+                                    <input asp-for="NewAddress.FullName"
+                                           class="form-control border-0 bg-light"
+                                           placeholder="John Doe" />
+                                </div>
                                 <span asp-validation-for="NewAddress.FullName" class="text-danger small"></span>
                             </div>
                             <div class="col-12">
-                                <label class="form-label fw-semibold">Street Address</label>
-                                <input asp-for="NewAddress.Street" class="form-control" placeholder="123 Main St" />
+                                <label class="form-label fw-semibold small text-uppercase"
+                                       style="letter-spacing:0.5px; color:#64748b;">Street Address</label>
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text border-0 bg-light">
+                                        <i class="bi bi-house" style="color:#6366f1;"></i>
+                                    </span>
+                                    <input asp-for="NewAddress.Street"
+                                           class="form-control border-0 bg-light"
+                                           placeholder="123 Main St" />
+                                </div>
                                 <span asp-validation-for="NewAddress.Street" class="text-danger small"></span>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">City</label>
-                                <input asp-for="NewAddress.City" class="form-control" />
+                                <label class="form-label fw-semibold small text-uppercase"
+                                       style="letter-spacing:0.5px; color:#64748b;">City</label>
+                                <input asp-for="NewAddress.City" class="form-control shadow-sm border-0 bg-light" />
                                 <span asp-validation-for="NewAddress.City" class="text-danger small"></span>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">State</label>
-                                <input asp-for="NewAddress.State" class="form-control" />
+                                <label class="form-label fw-semibold small text-uppercase"
+                                       style="letter-spacing:0.5px; color:#64748b;">State</label>
+                                <input asp-for="NewAddress.State" class="form-control shadow-sm border-0 bg-light" />
                                 <span asp-validation-for="NewAddress.State" class="text-danger small"></span>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Postal Code</label>
-                                <input asp-for="NewAddress.PostalCode" class="form-control" />
+                                <label class="form-label fw-semibold small text-uppercase"
+                                       style="letter-spacing:0.5px; color:#64748b;">Postal Code</label>
+                                <input asp-for="NewAddress.PostalCode" class="form-control shadow-sm border-0 bg-light" />
                                 <span asp-validation-for="NewAddress.PostalCode" class="text-danger small"></span>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Country</label>
-                                <input asp-for="NewAddress.Country" class="form-control" />
+                                <label class="form-label fw-semibold small text-uppercase"
+                                       style="letter-spacing:0.5px; color:#64748b;">Country</label>
+                                <input asp-for="NewAddress.Country" class="form-control shadow-sm border-0 bg-light" />
                                 <span asp-validation-for="NewAddress.Country" class="text-danger small"></span>
                             </div>
                             <div class="col-12">
-                                <label class="form-label fw-semibold">
-                                    Phone <span class="text-muted fw-normal">(optional)</span>
+                                <label class="form-label fw-semibold small text-uppercase"
+                                       style="letter-spacing:0.5px; color:#64748b;">
+                                    Phone <span class="text-muted fw-normal normal-case">(optional)</span>
                                 </label>
-                                <input asp-for="NewAddress.Phone" class="form-control" placeholder="+1 234 567 890" />
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text border-0 bg-light">
+                                        <i class="bi bi-telephone" style="color:#6366f1;"></i>
+                                    </span>
+                                    <input asp-for="NewAddress.Phone"
+                                           class="form-control border-0 bg-light"
+                                           placeholder="+1 234 567 890" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -97,55 +202,70 @@
             </div>
         </div>
 
+        <!-- Order Summary -->
         <div class="col-lg-5">
-            <div class="card shadow-sm" style="border-radius: 16px;">
-                <div class="card-header border-0 py-3"
-                     style="background: linear-gradient(135deg, #6366f1, #4f46e5); border-radius: 16px 16px 0 0;">
+            <div class="card shadow-sm" style="border-radius:20px; position:sticky; top:20px;">
+                <div class="card-header border-0 py-3 px-4"
+                     style="background:linear-gradient(135deg,#6366f1,#4f46e5); border-radius:20px 20px 0 0;">
                     <h5 class="mb-0 text-white fw-bold">
                         <i class="bi bi-receipt me-2"></i> Order Summary
                     </h5>
                 </div>
                 <div class="card-body p-0">
-                    <ul class="list-group list-group-flush">
+                    <div class="p-3">
                         @foreach (var item in Model.Cart.Items)
                         {
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
-                                <div>
-                                    <span class="fw-semibold">@item.ProductName</span>
-                                    <small class="d-block text-muted mt-1">
-                                        x@item.Quantity &nbsp;×&nbsp; $@item.UnitPrice.ToString("0.00")
-                                    </small>
+                            <div class="d-flex justify-content-between align-items-center py-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge rounded-circle fw-bold text-white"
+                                          style="background:#6366f1; width:22px; height:22px;
+                                                     font-size:0.7rem; line-height:22px; padding:0;">
+                                        @item.Quantity
+                                    </span>
+                                    <span class="fw-semibold small" style="color:#1e1b4b;">
+                                        @item.ProductName
+                                    </span>
                                 </div>
-                                <span class="fw-bold text-primary">$@item.SubTotal.ToString("0.00")</span>
-                            </li>
+                                <span class="fw-bold small" style="color:#6366f1;">
+                                    $@item.SubTotal.ToString("0.00")
+                                </span>
+                            </div>
                         }
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 bg-light">
-                            <span class="fw-bold fs-5">Total</span>
-                            <span class="fw-bold fs-4 text-primary">$@Model.Cart.Total.ToString("0.00")</span>
-                        </li>
-                    </ul>
+                    </div>
+                    <hr class="my-0" style="border-color:#e2e8f0;" />
+                    <div class="p-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">Subtotal</span>
+                            <span class="fw-semibold small">$@Model.Cart.Total.ToString("0.00")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted small">Shipping</span>
+                            <span class="fw-semibold small" style="color:#065f46;">
+                                <i class="bi bi-truck me-1"></i>Free
+                            </span>
+                        </div>
+                        <hr style="border-color:#e2e8f0;" />
+                        <div class="d-flex justify-content-between align-items-baseline">
+                            <span class="fw-bold">Total</span>
+                            <span class="fw-black" style="font-size:1.6rem; color:#6366f1;">
+                                $@Model.Cart.Total.ToString("0.00")
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-footer border-0 p-4" style="border-radius: 0 0 16px 16px;">
-                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold fs-5">
+                <div class="card-footer border-0 p-4" style="border-radius:0 0 20px 20px;">
+                    <button type="submit" class="btn w-100 py-3 fw-bold text-white"
+                            style="background:linear-gradient(135deg,#6366f1,#4f46e5);
+                                   border-radius:12px; font-size:1rem;
+                                   box-shadow:0 8px 20px rgba(99,102,241,0.35);">
                         <i class="bi bi-bag-check-fill me-2"></i> Place Order
                     </button>
                     <p class="text-center text-muted small mt-2 mb-0">
-                        <i class="bi bi-shield-check me-1"></i> Secure checkout
+                        <i class="bi bi-shield-check me-1" style="color:#6366f1;"></i>
+                        Secure & encrypted checkout
                     </p>
                 </div>
             </div>
         </div>
     </div>
 </form>
-
-@section Scripts {
-    <script>
-        const useNewCb = document.getElementById('useNew');
-        const newAddrForm = document.getElementById('newAddressForm');
-        if (useNewCb) {
-            useNewCb.addEventListener('change', function () {
-                newAddrForm.classList.toggle('d-none', !this.checked);
-            });
-        }
-    </script>
-}

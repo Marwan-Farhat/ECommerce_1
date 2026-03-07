@@ -1,69 +1,152 @@
-@model IEnumerable<ECommerce.PL.Models.ViewModels.OrderListItemVM>
+@model ECommerce.PL.Models.ViewModels.OrderListPagedVM
+@using ECommerce.DAL.Entities
 @{
     ViewData["Title"] = "My Orders";
 }
 
+<style>
+    .order-card {
+        transition: all 0.2s;
+    }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99,102,241,0.1) !important;
+        }
+
+    .pagination .page-link {
+        color: #6366f1;
+    }
+
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: white;
+        border: none;
+    }
+</style>
+
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold mb-0"><i class="bi bi-bag text-primary"></i> My Orders</h2>
+    <div>
+        <h2 class="fw-black mb-0" style="color:#1e1b4b;">
+            <i class="bi bi-bag text-primary"></i> My Orders
+        </h2>
+        <p class="text-muted small mb-0 mt-1">
+            @Model.TotalCount order(s) total
+        </p>
+    </div>
 </div>
 
-@if (!Model.Any())
+@if (!Model.Orders.Any())
 {
-    <div class="text-center py-5">
-        <div style="font-size: 5rem;">??</div>
-        <h4 class="fw-bold mt-3">No orders yet</h4>
-        <p class="text-muted">You haven't placed any orders yet.</p>
-        <a asp-controller="Products" asp-action="Index" class="btn btn-primary px-4 mt-2 fw-semibold">
-            <i class="bi bi-shop me-2"></i> Start Shopping
-        </a>
+    <div class="card shadow-sm text-center py-5" style="border-radius:24px;">
+        <div class="card-body py-5">
+            <div style="font-size:5rem;">??</div>
+            <h4 class="fw-bold mt-3 mb-2" style="color:#1e1b4b;">No orders yet</h4>
+            <p class="text-muted mb-4">You haven't placed any orders yet.</p>
+            <a asp-controller="Products" asp-action="Index"
+               class="btn py-2 px-5 fw-bold text-white"
+               style="background:linear-gradient(135deg,#6366f1,#4f46e5);
+                          border-radius:12px;
+                          box-shadow:0 8px 20px rgba(99,102,241,0.35);">
+                <i class="bi bi-shop me-2"></i> Start Shopping
+            </a>
+        </div>
     </div>
 }
 else
 {
-    <div class="card shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white;">
-                    <tr>
-                        <th class="py-3 ps-4">Order #</th>
-                        <th class="py-3">Date</th>
-                        <th class="py-3">Items</th>
-                        <th class="py-3">Total</th>
-                        <th class="py-3">Status</th>
-                        <th class="py-3"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var order in Model)
-                    {
-                        <tr>
-                            <td class="ps-4 fw-bold text-primary">#@order.Id</td>
-                            <td class="text-muted">
+    <div class="d-flex flex-column gap-3 mb-4">
+        @foreach (var order in Model.Orders)
+        {
+            <div class="card shadow-sm order-card" style="border-radius:16px;">
+                <div class="card-body p-4">
+                    <div class="row align-items-center g-3">
+                        <!-- Order ID & Date -->
+                        <div class="col-md-3">
+                            <p class="fw-black mb-1" style="color:#6366f1; font-size:1.1rem;">
+                                #@order.Id
+                            </p>
+                            <p class="text-muted small mb-0">
                                 <i class="bi bi-calendar3 me-1"></i>
                                 @order.OrderDate.ToString("MMM dd, yyyy")
-                            </td>
-                            <td>
-                                <span class="badge bg-light text-dark rounded-pill fw-normal px-3">
-                                    @order.ItemCount item(s)
-                                </span>
-                            </td>
-                            <td class="fw-bold">$@order.TotalAmount.ToString("0.00")</td>
-                            <td>
-                                <span class="badge rounded-pill px-3 py-2 badge-status-@order.Status">
-                                    @order.StatusDisplay
-                                </span>
-                            </td>
-                            <td>
-                                <a asp-action="Details" asp-route-id="@order.Id"
-                                   class="btn btn-sm fw-semibold"
-                                   style="background:#ede9fe; color:#5b21b6; border-radius: 8px;">
-                                    <i class="bi bi-eye me-1"></i> Details
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                            </p>
+                        </div>
+
+                        <!-- Items -->
+                        <div class="col-md-2">
+                            <p class="text-muted small mb-1">Items</p>
+                            <span class="badge rounded-pill fw-normal px-3"
+                                  style="background:#f1f5f9; color:#64748b;">
+                                @order.ItemCount item(s)
+                            </span>
+                        </div>
+
+                        <!-- Total -->
+                        <div class="col-md-3">
+                            <p class="text-muted small mb-1">Total</p>
+                            <span class="fw-black" style="color:#6366f1; font-size:1.2rem;">
+                                $@order.TotalAmount.ToString("0.00")
+                            </span>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="col-md-2">
+                            <p class="text-muted small mb-1">Status</p>
+                            <span class="badge rounded-pill px-3 py-2 fw-normal badge-status-@order.Status">
+                                @order.StatusDisplay
+                            </span>
+                        </div>
+
+                        <!-- Action -->
+                        <div class="col-md-2 text-md-end">
+                            <a asp-action="Details" asp-route-id="@order.Id"
+                               class="btn fw-semibold px-4"
+                               style="background:#ede9fe; color:#5b21b6; border-radius:10px;">
+                                <i class="bi bi-eye me-1"></i> Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <p class="text-muted small mb-0">
+                Page <strong>@Model.CurrentPage</strong> of <strong>@Model.TotalPages</strong>
+            </p>
+            <nav>
+                <ul class="pagination mb-0 gap-1">
+                    <!-- Previous -->
+                    <li class="page-item @(!Model.HasPrev ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-3 shadow-sm fw-semibold"
+                           asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    <!-- Page Numbers -->
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link border-0 rounded-3 shadow-sm fw-semibold"
+                               asp-action="Index" asp-route-page="@i">@i</a>
+                        </li>
+                    }
+
+                    <!-- Next -->
+                    <li class="page-item @(!Model.HasNext ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-3 shadow-sm fw-semibold"
+                           asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
 }
+

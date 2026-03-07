@@ -16,6 +16,7 @@ namespace ECommerce.BLL.Interfaces
     {
         Task<Order> CreateOrderAsync(string userId, int shippingAddressId, List<CartItem> cartItems);
         Task<IEnumerable<Order>> GetUserOrdersAsync(string userId);
+        Task<PagedResult<Order>> GetUserOrdersPagedAsync(string userId, int page, int pageSize);
         Task<Order?> GetOrderDetailsAsync(int orderId, string userId);
         Task<IEnumerable<Order>> GetAllOrdersAsync();
         Task UpdateOrderStatusAsync(int orderId, OrderStatus status);

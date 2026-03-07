@@ -23,7 +23,7 @@ namespace ECommerce.PL.Controllers
                 Search = q,
                 Sort = sort,
                 Page = page,
-                PageSize = 12
+                PageSize = 9
             };
 
             var result = await _productService.GetProductsAsync(filters);

@@ -34,6 +34,16 @@ namespace ECommerce.PL.Models.ViewModels
         public string? ImageUrl { get; set; }
     }
 
+    public class OrderListPagedVM
+    {
+        public IEnumerable<OrderListItemVM> Orders { get; set; } = new List<OrderListItemVM>();
+        public int CurrentPage { get; set; }
+        public int TotalPages { get; set; }
+        public bool HasPrev => CurrentPage > 1;
+        public bool HasNext => CurrentPage < TotalPages;
+        public int TotalCount { get; set; }
+    }
+
     // Admin ViewModels
     public class AdminOrderListVM
     {

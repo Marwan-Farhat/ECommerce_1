@@ -28,6 +28,31 @@ namespace ECommerce.PL.Controllers
             _userManager = userManager;
         }
 
+        public async Task<IActionResult> Index(int page = 1)
+        {
+            const int pageSize = 5;
+            var userId = _userManager.GetUserId(User)!;
+
+            var result = await _orderService.GetUserOrdersPagedAsync(userId, page, pageSize);
+
+            var vm = new OrderListPagedVM
+            {
+                Orders = result.Items.Select(o => new OrderListItemVM
+                {
+                    Id = o.Id,
+                    OrderDate = o.OrderDate,
+                    Status = o.Status,
+                    TotalAmount = o.TotalAmount,
+                    ItemCount = o.OrderItems.Sum(oi => oi.Quantity)
+                }),
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize),
+                TotalCount = result.TotalCount
+            };
+
+            return View(vm);
+        }
+
         [HttpGet]
         public async Task<IActionResult> Checkout()
         {
@@ -134,24 +159,7 @@ namespace ECommerce.PL.Controllers
                 model.Cart = BuildCartVM(cartItems);
                 return View(model);
             }
-        }
-
-        public async Task<IActionResult> Index()
-        {
-            var userId = _userManager.GetUserId(User)!;
-            var orders = await _orderService.GetUserOrdersAsync(userId);
-
-            var vm = orders.Select(o => new OrderListItemVM
-            {
-                Id = o.Id,
-                OrderDate = o.OrderDate,
-                Status = o.Status,
-                TotalAmount = o.TotalAmount,
-                ItemCount = o.OrderItems.Sum(oi => oi.Quantity)
-            });
-
-            return View(vm);
-        }
+        }  
 
         public async Task<IActionResult> Details(int id)
         {

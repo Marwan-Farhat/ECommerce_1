@@ -2,58 +2,189 @@
     ViewData["Title"] = "Register";
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5 col-lg-4">
-        <div class="text-center mb-4">
-            <i class="bi bi-person-plus-fill text-primary" style="font-size: 3rem;"></i>
-            <h3 class="fw-bold mt-2">Create Account</h3>
-            <p class="text-muted">Join us and start shopping!</p>
-        </div>
-        <div class="card shadow-lg" style="border-radius: 20px;">
-            <div class="card-body p-4">
-                <form asp-controller="Account" asp-action="Register" method="post">
-                    <div asp-validation-summary="All" class="alert alert-danger small py-2"></div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <label class="form-label fw-semibold">First Name</label>
-                            <input type="text" name="firstName" class="form-control" placeholder="John" required />
+<style>
+    .min-vh-75 {
+        min-height: 75vh;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+        border-color: #6366f1;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function togglePassword() {
+            const input = document.getElementById('passwordInput');
+            const icon = document.getElementById('eyeIcon');
+            input.type = input.type === 'password' ? 'text' : 'password';
+            icon.className = input.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+        }
+
+        document.getElementById('passwordInput').addEventListener('input', function () {
+            const val = this.value;
+            const bars = [document.getElementById('s1'), document.getElementById('s2'),
+                          document.getElementById('s3'), document.getElementById('s4')];
+            const text = document.getElementById('strengthText');
+
+            let strength = 0;
+            if (val.length >= 6)  strength++;
+            if (val.length >= 10) strength++;
+            if (/[A-Z]/.test(val) && /[0-9]/.test(val)) strength++;
+            if (/[^A-Za-z0-9]/.test(val)) strength++;
+
+            const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e'];
+            const labels = ['Weak', 'Fair', 'Good', 'Strong'];
+
+            bars.forEach((b, i) => {
+                b.style.background = i < strength ? colors[strength - 1] : '#e2e8f0';
+            });
+
+            text.textContent = val.length > 0 ? labels[strength - 1] ?? '' : '';
+            text.style.color = strength > 0 ? colors[strength - 1] : '';
+        });
+    </script>
+}
+
+<div class="row min-vh-75 align-items-center justify-content-center py-5">
+    <div class="col-md-10 col-lg-8">
+        <div class="card shadow-lg overflow-hidden" style="border-radius: 24px;">
+            <div class="row g-0">
+                <!-- Left Panel -->
+                <div class="col-md-5 d-none d-md-flex flex-column justify-content-center align-items-center p-5 text-white"
+                     style="background: linear-gradient(160deg, #6366f1 0%, #3730a3 100%);">
+                    <i class="bi bi-person-hearts mb-4" style="font-size: 4rem; opacity: 0.9;"></i>
+                    <h3 class="fw-black text-center mb-2">Join Us Today!</h3>
+                    <p class="text-center opacity-75 small">
+                        Create your account and enjoy exclusive deals, fast checkout, and order tracking.
+                    </p>
+                    <hr class="w-50 opacity-25 my-4" />
+                    <div class="d-flex flex-column gap-2 w-100">
+                        <div class="d-flex align-items-center gap-2 opacity-90">
+                            <i class="bi bi-check-circle-fill" style="color:#a5b4fc;"></i>
+                            <span class="small">Track your orders easily</span>
                         </div>
-                        <div class="col-6">
-                            <label class="form-label fw-semibold">Last Name</label>
-                            <input type="text" name="lastName" class="form-control" placeholder="Doe" required />
+                        <div class="d-flex align-items-center gap-2 opacity-90">
+                            <i class="bi bi-check-circle-fill" style="color:#a5b4fc;"></i>
+                            <span class="small">Save multiple addresses</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 opacity-90">
+                            <i class="bi bi-check-circle-fill" style="color:#a5b4fc;"></i>
+                            <span class="small">Fast & secure checkout</span>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Email Address</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="bi bi-envelope text-muted"></i>
-                            </span>
-                            <input type="email" name="email" class="form-control border-start-0 ps-0"
-                                   placeholder="example@email.com" required />
-                        </div>
-                    </div>
+                    <hr class="w-50 opacity-25 my-4" />
+                    <p class="text-center opacity-60 small mb-1">Already have an account?</p>
+                    <a asp-controller="Account" asp-action="Login"
+                       class="btn btn-outline-light btn-sm fw-semibold px-4 mt-1"
+                       style="border-radius: 50px;">
+                        Sign In
+                    </a>
+                </div>
+
+                <!-- Right Panel (Form) -->
+                <div class="col-md-7 p-5">
                     <div class="mb-4">
-                        <label class="form-label fw-semibold">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="bi bi-lock text-muted"></i>
-                            </span>
-                            <input type="password" name="password" class="form-control border-start-0 ps-0"
-                                   placeholder="Min. 6 characters" required />
-                        </div>
+                        <h4 class="fw-black mb-1" style="color: #1e1b4b;">Create Account</h4>
+                        <p class="text-muted small mb-0">Fill in your details to get started</p>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
-                        <i class="bi bi-person-check me-1"></i> Create Account
-                    </button>
-                </form>
-            </div>
-            <div class="card-footer bg-transparent text-center py-3 border-0">
-                <span class="text-muted">Already have an account?</span>
-                <a asp-controller="Account" asp-action="Login" class="text-primary fw-semibold ms-1">
-                    Login
-                </a>
+
+                    <form asp-controller="Account" asp-action="Register" method="post">
+                        <div asp-validation-summary="All"
+                             class="alert small py-2 mb-3"
+                             style="background:#fee2e2; color:#991b1b; border:none; border-radius:10px;">
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-semibold small text-uppercase"
+                                       style="letter-spacing:0.5px; color:#64748b;">
+                                    First Name
+                                </label>
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text border-0 bg-light">
+                                        <i class="bi bi-person" style="color:#6366f1;"></i>
+                                    </span>
+                                    <input type="text" name="firstName"
+                                           class="form-control border-0 bg-light py-3"
+                                           placeholder="John" required />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-semibold small text-uppercase"
+                                       style="letter-spacing:0.5px; color:#64748b;">
+                                    Last Name
+                                </label>
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text border-0 bg-light">
+                                        <i class="bi bi-person" style="color:#6366f1;"></i>
+                                    </span>
+                                    <input type="text" name="lastName"
+                                           class="form-control border-0 bg-light py-3"
+                                           placeholder="Doe" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-uppercase"
+                                   style="letter-spacing:0.5px; color:#64748b;">
+                                Email Address
+                            </label>
+                            <div class="input-group shadow-sm">
+                                <span class="input-group-text border-0 bg-light">
+                                    <i class="bi bi-envelope" style="color:#6366f1;"></i>
+                                </span>
+                                <input type="email" name="email"
+                                       class="form-control border-0 bg-light py-3"
+                                       placeholder="example@email.com" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold small text-uppercase"
+                                   style="letter-spacing:0.5px; color:#64748b;">
+                                Password
+                            </label>
+                            <div class="input-group shadow-sm">
+                                <span class="input-group-text border-0 bg-light">
+                                    <i class="bi bi-lock" style="color:#6366f1;"></i>
+                                </span>
+                                <input type="password" name="password" id="passwordInput"
+                                       class="form-control border-0 bg-light py-3"
+                                       placeholder="Min. 6 characters" required />
+                                <button type="button" class="input-group-text border-0 bg-light"
+                                        onclick="togglePassword()">
+                                    <i class="bi bi-eye" id="eyeIcon" style="color:#94a3b8;"></i>
+                                </button>
+                            </div>
+                            <div class="mt-2 d-flex gap-1" id="strengthBar">
+                                <div class="flex-grow-1 rounded" style="height:4px; background:#e2e8f0;" id="s1"></div>
+                                <div class="flex-grow-1 rounded" style="height:4px; background:#e2e8f0;" id="s2"></div>
+                                <div class="flex-grow-1 rounded" style="height:4px; background:#e2e8f0;" id="s3"></div>
+                                <div class="flex-grow-1 rounded" style="height:4px; background:#e2e8f0;" id="s4"></div>
+                            </div>
+                            <small class="text-muted" id="strengthText"></small>
+                        </div>
+
+                        <button type="submit" class="btn w-100 py-3 fw-bold text-white mb-3"
+                                style="background: linear-gradient(135deg, #6366f1, #4f46e5);
+                                       border-radius: 12px; font-size: 1rem;
+                                       box-shadow: 0 8px 20px rgba(99,102,241,0.4);">
+                            <i class="bi bi-person-check me-2"></i> Create Account
+                        </button>
+
+                        <p class="text-center text-muted small d-md-none mb-0">
+                            Already have an account?
+                            <a asp-controller="Account" asp-action="Login"
+                               class="fw-semibold text-decoration-none"
+                               style="color:#6366f1;">Sign In</a>
+                        </p>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+

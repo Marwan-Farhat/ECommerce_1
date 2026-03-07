@@ -4,104 +4,138 @@
     ViewData["Title"] = $"Order #{Model.Id}";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<style>
+    .order-item {
+        transition: background 0.2s;
+    }
+
+        .order-item:hover {
+            background: #fafaff;
+        }
+
+        .order-item:last-child {
+            border-bottom: none !important;
+        }
+</style>
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
     <div>
-        <h2 class="fw-bold mb-1"><i class="bi bi-receipt text-primary"></i> Order #@Model.Id</h2>
-        <span class="badge rounded-pill px-3 py-2 badge-status-@Model.Status">@Model.StatusDisplay</span>
+        <h2 class="fw-black mb-1" style="color:#1e1b4b;">
+            <i class="bi bi-receipt text-primary"></i> Order #@Model.Id
+        </h2>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="badge rounded-pill px-3 py-2 badge-status-@Model.Status">
+                @Model.StatusDisplay
+            </span>
+            <span class="text-muted small">
+                <i class="bi bi-calendar3 me-1"></i>
+                Placed on @Model.OrderDate.ToString("MMMM dd, yyyy") at @Model.OrderDate.ToString("HH:mm")
+            </span>
+        </div>
     </div>
     <a asp-action="Index" class="btn btn-outline-secondary fw-semibold">
-        <i class="bi bi-arrow-left me-1"></i> Back to Orders
+        <i class="bi bi-arrow-left me-1"></i> My Orders
     </a>
 </div>
 
 <div class="row g-4">
+    <!-- Order Items -->
     <div class="col-md-8">
-        <div class="card shadow-sm mb-4">
+        <div class="card shadow-sm" style="border-radius:20px;">
             <div class="card-header border-0 py-3 px-4"
-                 style="background: linear-gradient(135deg, #6366f1, #4f46e5);">
+                 style="background:linear-gradient(135deg,#6366f1,#4f46e5); border-radius:20px 20px 0 0;">
                 <h5 class="mb-0 text-white fw-bold">
                     <i class="bi bi-box-seam me-2"></i> Order Items
                 </h5>
             </div>
             <div class="card-body p-0">
-                <table class="table align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="ps-4">Product</th>
-                            <th>Unit Price</th>
-                            <th>Quantity</th>
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.Items)
-                        {
-                            <tr>
-                                <td class="ps-4 fw-semibold">
-                                    <a asp-controller="Products" asp-action="Details"
-                                       asp-route-id="@item.ProductId"
-                                       class="text-decoration-none text-dark">
-                                        @item.ProductName
-                                    </a>
-                                </td>
-                                <td class="text-muted">$@item.UnitPrice.ToString("0.00")</td>
-                                <td>
-                                    <span class="badge bg-light text-dark rounded-pill px-3">
-                                        x@item.Quantity
-                                    </span>
-                                </td>
-                                <td class="fw-bold text-primary">$@item.SubTotal.ToString("0.00")</td>
-                            </tr>
-                        }
-                    </tbody>
-                    <tfoot class="table-light">
-                        <tr>
-                            <td colspan="3" class="text-end fw-bold ps-4">Total:</td>
-                            <td class="fw-bold text-primary fs-5">$@Model.TotalAmount.ToString("0.00")</td>
-                        </tr>
-                    </tfoot>
-                </table>
+                @foreach (var item in Model.Items)
+                {
+                    <div class="d-flex align-items-center gap-3 p-4 border-bottom order-item">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center fw-black text-white flex-shrink-0"
+                             style="width:48px; height:48px; background:linear-gradient(135deg,#6366f1,#4f46e5); font-size:1.1rem;">
+                            @item.Quantity
+                        </div>
+                        <div class="flex-grow-1">
+                            <a asp-controller="Products" asp-action="Details"
+                               asp-route-id="@item.ProductId"
+                               class="fw-bold text-decoration-none d-block mb-1"
+                               style="color:#1e1b4b;">
+                                @item.ProductName
+                            </a>
+                            <span class="text-muted small">
+                                $@item.UnitPrice.ToString("0.00") × @item.Quantity
+                            </span>
+                        </div>
+                        <div class="fw-black text-end" style="color:#6366f1; font-size:1.1rem;">
+                            $@item.SubTotal.ToString("0.00")
+                        </div>
+                    </div>
+                }
+                <!-- Total Row -->
+                <div class="d-flex justify-content-between align-items-center p-4"
+                     style="background:#fafaff;">
+                    <span class="fw-bold" style="color:#1e1b4b;">Order Total</span>
+                    <span class="fw-black" style="font-size:1.5rem; color:#6366f1;">
+                        $@Model.TotalAmount.ToString("0.00")
+                    </span>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <!-- Order Info -->
-        <div class="card shadow-sm mb-3">
-            <div class="card-header border-0 bg-light py-3">
-                <h6 class="mb-0 fw-bold">
+    <!-- Right Column -->
+    <div class="col-md-4 d-flex flex-column gap-3">
+        <!-- Order Info & Cancel -->
+        <div class="card shadow-sm" style="border-radius:20px;">
+            <div class="card-header border-0 bg-light py-3 px-4" style="border-radius:20px 20px 0 0;">
+                <h6 class="mb-0 fw-bold" style="color:#1e1b4b;">
                     <i class="bi bi-info-circle text-primary me-2"></i> Order Info
                 </h6>
             </div>
-            <div class="card-body">
-                <div class="d-flex justify-content-between mb-2">
-                    <span class="text-muted">Date</span>
-                    <span class="fw-semibold">@Model.OrderDate.ToString("MMM dd, yyyy")</span>
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-3"
+                     style="border-bottom:1px solid #e2e8f0;">
+                    <span class="text-muted small">Status</span>
+                    <span class="badge rounded-pill px-3 py-2 badge-status-@Model.Status">
+                        @Model.StatusDisplay
+                    </span>
                 </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span class="text-muted">Time</span>
-                    <span class="fw-semibold">@Model.OrderDate.ToString("HH:mm")</span>
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-3"
+                     style="border-bottom:1px solid #e2e8f0;">
+                    <span class="text-muted small">Date</span>
+                    <span class="fw-semibold small">@Model.OrderDate.ToString("MMM dd, yyyy")</span>
                 </div>
-                <div class="d-flex justify-content-between mb-3">
-                    <span class="text-muted">Status</span>
-                    <span class="badge rounded-pill badge-status-@Model.Status">@Model.StatusDisplay</span>
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-3"
+                     style="border-bottom:1px solid #e2e8f0;">
+                    <span class="text-muted small">Shipping</span>
+                    <span class="fw-semibold small" style="color:#065f46;">
+                        <i class="bi bi-truck me-1"></i> Free
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted small">Total</span>
+                    <span class="fw-black" style="color:#6366f1;">
+                        $@Model.TotalAmount.ToString("0.00")
+                    </span>
                 </div>
 
                 @if (!string.IsNullOrEmpty(Model.Notes))
                 {
-                    <hr />
+                    <hr style="border-color:#e2e8f0;" />
                     <p class="text-muted small mb-0">
+                        <i class="bi bi-chat-left-text me-1"></i>
                         <strong>Notes:</strong> @Model.Notes
                     </p>
                 }
 
-                @* ? ?? Cancel ????? ?? ?? Pending *@
+                @* Cancel Button — Pending ??? *@
                 @if (Model.Status == OrderStatus.Pending)
                 {
-                    <hr />
+                    <hr style="border-color:#e2e8f0;" />
                     <form asp-action="Cancel" asp-route-id="@Model.Id" method="post"
                           onsubmit="return confirm('Are you sure you want to cancel this order?')">
-                        <button type="submit" class="btn w-100 fw-semibold"
+                        <button type="submit" class="btn w-100 fw-semibold py-2"
                                 style="background:#fee2e2; color:#991b1b; border-radius:10px;">
                             <i class="bi bi-x-circle-fill me-2"></i> Cancel Order
                         </button>
@@ -111,27 +145,39 @@
         </div>
 
         <!-- Shipping Address -->
-        <div class="card shadow-sm">
-            <div class="card-header border-0 bg-light py-3">
-                <h6 class="mb-0 fw-bold">
+        <div class="card shadow-sm" style="border-radius:20px;">
+            <div class="card-header border-0 bg-light py-3 px-4" style="border-radius:20px 20px 0 0;">
+                <h6 class="mb-0 fw-bold" style="color:#1e1b4b;">
                     <i class="bi bi-geo-alt-fill text-primary me-2"></i> Shipping Address
                 </h6>
             </div>
-            <div class="card-body">
-                <p class="fw-bold mb-1">@Model.ShippingAddress.FullName</p>
-                <p class="text-muted mb-1">@Model.ShippingAddress.Street</p>
-                <p class="text-muted mb-1">
-                    @Model.ShippingAddress.City, @Model.ShippingAddress.State @Model.ShippingAddress.PostalCode
-                </p>
-                <p class="text-muted mb-0">@Model.ShippingAddress.Country</p>
-                @if (!string.IsNullOrEmpty(Model.ShippingAddress.Phone))
-                {
-                    <p class="mt-2 mb-0">
-                        <i class="bi bi-telephone-fill text-primary me-1"></i>
-                        @Model.ShippingAddress.Phone
-                    </p>
-                }
+            <div class="card-body p-4">
+                <div class="d-flex gap-3">
+                    <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                         style="width:42px; height:42px; background:#ede9fe;">
+                        <i class="bi bi-house-fill" style="color:#6366f1;"></i>
+                    </div>
+                    <address class="mb-0">
+                        <p class="fw-bold mb-1" style="color:#1e1b4b;">
+                            @Model.ShippingAddress.FullName
+                        </p>
+                        <p class="text-muted small mb-1">@Model.ShippingAddress.Street</p>
+                        <p class="text-muted small mb-1">
+                            @Model.ShippingAddress.City, @Model.ShippingAddress.State
+                            @Model.ShippingAddress.PostalCode
+                        </p>
+                        <p class="text-muted small mb-0">@Model.ShippingAddress.Country</p>
+                        @if (!string.IsNullOrEmpty(Model.ShippingAddress.Phone))
+                        {
+                            <p class="mt-2 mb-0 small">
+                                <i class="bi bi-telephone-fill me-1" style="color:#6366f1;"></i>
+                                @Model.ShippingAddress.Phone
+                            </p>
+                        }
+                    </address>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
