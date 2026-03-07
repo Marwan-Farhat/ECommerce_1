@@ -25,6 +25,7 @@ namespace ECommerce.BLL.Interfaces
     public interface IProductService
     {
         Task<PagedResult<Product>> GetProductsAsync(ProductFilterParams filters);
+        Task<IEnumerable<Product>> GetAllProductsForAdminAsync();
         Task<Product?> GetProductByIdAsync(int id);
         Task<IEnumerable<Product>> GetProductsByCategoryAsync(int categoryId);
         Task CreateProductAsync(Product product);

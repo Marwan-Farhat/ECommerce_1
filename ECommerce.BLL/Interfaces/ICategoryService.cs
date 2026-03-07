@@ -4,6 +4,7 @@ namespace ECommerce.BLL.Interfaces
 {
     public interface ICategoryService
     {
+        Task<IEnumerable<Category>> GetActiveCategoriesAsync();
         Task<IEnumerable<Category>> GetAllCategoriesAsync();
         Task<Category?> GetCategoryByIdAsync(int id);
         Task CreateCategoryAsync(Category category);

@@ -18,7 +18,7 @@ namespace ECommerce.BLL.Services
         {
             var query = _unitOfWork.Products.Query()
                 .Include(p => p.Category)
-                .Where(p => p.IsActive);
+                .Where(p => p.IsActive && p.Category.IsActive);
 
             // Filter by category
             if (filters.CategoryId.HasValue)
@@ -53,7 +53,13 @@ namespace ECommerce.BLL.Services
                 PageSize = filters.PageSize
             };
         }
-
+        public async Task<IEnumerable<Product>> GetAllProductsForAdminAsync()
+        {
+            return await _unitOfWork.Products.Query()
+                .Include(p => p.Category)
+                .OrderBy(p => p.Id)
+                .ToListAsync();  
+        }
         public async Task<Product?> GetProductByIdAsync(int id)
             => await _unitOfWork.Products.Query()
                 .Include(p => p.Category)

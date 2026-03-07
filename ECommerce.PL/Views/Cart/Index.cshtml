@@ -3,16 +3,22 @@
     ViewData["Title"] = "Shopping Cart";
 }
 
-<h2 class="mb-4"><i class="bi bi-cart3"></i> Shopping Cart</h2>
+<div class="d-flex align-items-center mb-4 gap-3">
+    <h2 class="fw-bold mb-0"><i class="bi bi-cart3 text-primary"></i> Shopping Cart</h2>
+    @if (!Model.IsEmpty)
+    {
+        <span class="badge bg-primary rounded-pill">@Model.ItemCount items</span>
+    }
+</div>
 
 @if (Model.IsEmpty)
 {
     <div class="text-center py-5">
-        <i class="bi bi-cart-x display-1 text-muted"></i>
-        <h4 class="mt-3">Your cart is empty</h4>
-        <p class="text-muted">Add some products to get started.</p>
-        <a asp-controller="Products" asp-action="Index" class="btn btn-primary mt-2">
-            <i class="bi bi-shop"></i> Continue Shopping
+        <div class="mb-4" style="font-size: 5rem;">??</div>
+        <h4 class="fw-bold">Your cart is empty</h4>
+        <p class="text-muted">Looks like you haven't added anything yet.</p>
+        <a asp-controller="Products" asp-action="Index" class="btn btn-primary px-4 py-2 mt-2 fw-semibold">
+            <i class="bi bi-shop me-2"></i> Start Shopping
         </a>
     </div>
 }
@@ -22,41 +28,47 @@ else
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-dark">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white;">
                             <tr>
-                                <th>Product</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                                <th>Subtotal</th>
-                                <th></th>
+                                <th class="py-3 ps-4 rounded-top-start">Product</th>
+                                <th class="py-3">Price</th>
+                                <th class="py-3">Quantity</th>
+                                <th class="py-3">Subtotal</th>
+                                <th class="py-3 rounded-top-end"></th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model.Items)
                             {
                                 <tr>
-                                    <td class="align-middle">
+                                    <td class="ps-4">
                                         <div class="d-flex align-items-center gap-3">
                                             <img src="@(item.ImageUrl ?? "https://via.placeholder.com/60")"
-                                                 width="60" height="60" style="object-fit: cover;" class="rounded" alt="@item.ProductName" />
+                                                 width="60" height="60"
+                                                 style="object-fit: cover; border-radius: 12px;"
+                                                 alt="@item.ProductName"
+                                                 onerror="this.src='https://via.placeholder.com/60'" />
                                             <span class="fw-semibold">@item.ProductName</span>
                                         </div>
                                     </td>
-                                    <td class="align-middle">$@item.UnitPrice.ToString("0.00")</td>
-                                    <td class="align-middle" style="width: 130px;">
-                                        <form asp-action="Update" method="post" class="d-flex gap-1">
+                                    <td class="text-muted">$@item.UnitPrice.ToString("0.00")</td>
+                                    <td style="width: 130px;">
+                                        <form asp-action="Update" method="post">
                                             <input type="hidden" name="productId" value="@item.ProductId" />
-                                            <input type="number" name="quantity" value="@item.Quantity" min="1" max="99"
-                                                   class="form-control form-control-sm" style="width: 70px;"
+                                            <input type="number" name="quantity" value="@item.Quantity"
+                                                   min="1" max="99"
+                                                   class="form-control form-control-sm text-center fw-bold border-0 shadow-sm"
+                                                   style="width: 70px;"
                                                    onchange="this.form.submit()" />
                                         </form>
                                     </td>
-                                    <td class="align-middle fw-bold">$@item.SubTotal.ToString("0.00")</td>
-                                    <td class="align-middle">
+                                    <td class="fw-bold text-primary">$@item.SubTotal.ToString("0.00")</td>
+                                    <td>
                                         <form asp-action="Remove" method="post">
                                             <input type="hidden" name="productId" value="@item.ProductId" />
-                                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <button type="submit" class="btn btn-sm"
+                                                    style="background:#fee2e2; color:#991b1b; border-radius:8px;">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -70,29 +82,36 @@ else
         </div>
 
         <div class="col-lg-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Order Summary</h5>
+            <div class="card shadow-sm" style="border-radius: 16px;">
+                <div class="card-header border-0 py-3"
+                     style="background: linear-gradient(135deg, #6366f1, #4f46e5); border-radius: 16px 16px 0 0;">
+                    <h5 class="mb-0 text-white fw-bold">
+                        <i class="bi bi-receipt me-2"></i> Order Summary
+                    </h5>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Items (@Model.ItemCount)</span>
-                        <span>$@Model.Total.ToString("0.00")</span>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Items (@Model.ItemCount)</span>
+                        <span class="fw-semibold">$@Model.Total.ToString("0.00")</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Shipping</span>
-                        <span class="text-success">Free</span>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Shipping</span>
+                        <span class="fw-semibold" style="color:#065f46;">
+                            <i class="bi bi-truck me-1"></i> Free
+                        </span>
                     </div>
                     <hr />
-                    <div class="d-flex justify-content-between fw-bold h5">
-                        <span>Total</span>
-                        <span class="text-primary">$@Model.Total.ToString("0.00")</span>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="fw-bold fs-5">Total</span>
+                        <span class="fw-bold fs-4 text-primary">$@Model.Total.ToString("0.00")</span>
                     </div>
-                    <a asp-controller="Orders" asp-action="Checkout" class="btn btn-success btn-lg w-100 mt-3">
-                        <i class="bi bi-credit-card"></i> Proceed to Checkout
+                    <a asp-controller="Orders" asp-action="Checkout"
+                       class="btn btn-primary w-100 py-2 fw-bold mb-2">
+                        <i class="bi bi-credit-card me-2"></i> Proceed to Checkout
                     </a>
-                    <a asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">
-                        Continue Shopping
+                    <a asp-controller="Products" asp-action="Index"
+                       class="btn btn-outline-secondary w-100 py-2 fw-semibold">
+                        <i class="bi bi-arrow-left me-1"></i> Continue Shopping
                     </a>
                 </div>
             </div>

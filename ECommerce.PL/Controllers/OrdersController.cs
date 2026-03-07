@@ -69,7 +69,6 @@ namespace ECommerce.PL.Controllers
         }
 
         [HttpPost]
-        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> Checkout(CheckoutVM model)
         {
             var userId = _userManager.GetUserId(User)!;
@@ -200,5 +199,21 @@ namespace ECommerce.PL.Controllers
                 Quantity = c.Quantity
             }).ToList()
         };
+
+        [HttpPost]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            var userId = _userManager.GetUserId(User)!;
+            try
+            {
+                await _orderService.CancelOrderAsync(id, userId);
+                TempData["Success"] = $"Order #{id} has been cancelled successfully.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+            return RedirectToAction(nameof(Details), new { id });
+        }
     }
 }

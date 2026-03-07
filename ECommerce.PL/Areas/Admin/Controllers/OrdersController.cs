@@ -75,5 +75,26 @@ namespace ECommerce.PL.Areas.Admin.Controllers
             TempData["Success"] = "Order status updated.";
             return RedirectToAction(nameof(Details), new { id = vm.OrderId });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            try
+            {
+                var order = await _orderService.GetAllOrdersAsync();
+                var o = order.FirstOrDefault(x => x.Id == id);
+
+                if (o != null)
+                    await _orderService.CancelOrderAsync(id, o.UserId);
+
+                TempData["Success"] = $"Order #{id} has been cancelled.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
     }
 }

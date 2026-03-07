@@ -5,52 +5,73 @@
 
 <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-controller="Catalog" asp-action="Index">Shop</a></li>
         <li class="breadcrumb-item">
-            <a asp-controller="Catalog" asp-action="Index" asp-route-categoryId="@Model.CategoryId">@Model.CategoryName</a>
+            <a asp-controller="Products" asp-action="Index" class="text-decoration-none">Shop</a>
         </li>
-        <li class="breadcrumb-item active">@Model.Name</li>
+        <li class="breadcrumb-item">
+            <a asp-controller="Products" asp-action="Index"
+               asp-route-categoryId="@Model.CategoryId" class="text-decoration-none">@Model.CategoryName</a>
+        </li>
+        <li class="breadcrumb-item active fw-semibold">@Model.Name</li>
     </ol>
 </nav>
 
-<div class="row g-5">
-    <div class="col-md-5">
-        <img src="@(Model.ImageUrl ?? "https://via.placeholder.com/500x400")"
-             class="img-fluid rounded shadow" alt="@Model.Name" />
-    </div>
-    <div class="col-md-7">
-        <span class="badge bg-secondary mb-2">@Model.CategoryName</span>
-        <h1 class="mb-3">@Model.Name</h1>
-        <h2 class="text-primary mb-4">$@Model.Price.ToString("0.00")</h2>
+<div class="card shadow-sm p-4" style="border-radius: 20px;">
+    <div class="row g-5 align-items-center">
+        <div class="col-md-5">
+            <div style="border-radius: 16px; overflow: hidden;">
+                <img src="@(Model.ImageUrl ?? "https://picsum.photos/seed/@Model.Id/500/400")"
+                     class="img-fluid w-100" style="object-fit: cover; max-height: 400px;"
+                     alt="@Model.Name"
+                     onerror="this.src='https://via.placeholder.com/500x400'" />
+            </div>
+        </div>
+        <div class="col-md-7">
+            <span class="badge rounded-pill fw-normal mb-3 px-3 py-2"
+                  style="background:#ede9fe; color:#5b21b6; font-size: 0.85rem;">
+                <i class="bi bi-tag me-1"></i> @Model.CategoryName
+            </span>
+            <h1 class="fw-bold mb-2">@Model.Name</h1>
+            <h2 class="fw-bold mb-3" style="color: #6366f1;">$@Model.Price.ToString("0.00")</h2>
 
-        @if (Model.InStock)
-        {
-            <span class="badge bg-success mb-3"><i class="bi bi-check-circle"></i> In Stock (@Model.StockQuantity available)</span>
-        }
-        else
-        {
-            <span class="badge bg-danger mb-3">Out of Stock</span>
-        }
+            @if (Model.InStock)
+            {
+                <span class="badge rounded-pill px-3 py-2 mb-4"
+                      style="background:#d1fae5; color:#065f46; font-size: 0.85rem;">
+                    <i class="bi bi-check-circle-fill me-1"></i> In Stock — @Model.StockQuantity available
+                </span>
+            }
+            else
+            {
+                <span class="badge rounded-pill px-3 py-2 mb-4"
+                      style="background:#fee2e2; color:#991b1b;">
+                    <i class="bi bi-x-circle-fill me-1"></i> Out of Stock
+                </span>
+            }
 
-        <p class="lead mb-4">@Model.Description</p>
+            <p class="text-muted mb-4 lh-lg">@Model.Description</p>
 
-        @if (Model.InStock)
-        {
-            <form asp-controller="Cart" asp-action="Add" method="post" class="d-flex gap-3 align-items-center">
-                <input type="hidden" name="productId" value="@Model.Id" />
-                <div class="input-group" style="width: 120px;">
-                    <span class="input-group-text">Qty</span>
-                    <input type="number" name="quantity" value="1" min="1" max="@Model.StockQuantity" class="form-control" />
-                </div>
-                <button type="submit" class="btn btn-primary btn-lg">
-                    <i class="bi bi-cart-plus"></i> Add to Cart
-                </button>
-            </form>
-        }
+            @if (Model.InStock)
+            {
+                <form asp-controller="Cart" asp-action="Add" method="post"
+                      class="d-flex gap-3 align-items-center mb-4">
+                    <input type="hidden" name="productId" value="@Model.Id" />
+                    <div class="input-group shadow-sm" style="width: 130px;">
+                        <span class="input-group-text bg-light border-0">Qty</span>
+                        <input type="number" name="quantity" value="1"
+                               min="1" max="@Model.StockQuantity"
+                               class="form-control border-0 text-center fw-bold" />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg px-4 fw-semibold shadow-sm">
+                        <i class="bi bi-cart-plus me-2"></i> Add to Cart
+                    </button>
+                </form>
+            }
 
-        <hr class="my-4" />
-        <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Continue Shopping
-        </a>
+            <hr class="my-3" />
+            <a asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary fw-semibold">
+                <i class="bi bi-arrow-left me-1"></i> Continue Shopping
+            </a>
+        </div>
     </div>
 </div>

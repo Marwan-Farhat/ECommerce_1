@@ -22,15 +22,16 @@ namespace ECommerce.PL.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var result = await _productService.GetProductsAsync(new ProductFilterParams { PageSize = 100 });
-            var vm = result.Items.Select(p => new ProductListItemVM
+            var products = await _productService.GetAllProductsForAdminAsync(); 
+            var vm = products.Select(p => new ProductListItemVM
             {
                 Id = p.Id,
                 Name = p.Name,
+                CategoryName = p.Category.Name,
                 Price = p.Price,
                 StockQuantity = p.StockQuantity,
-                CategoryName = p.Category?.Name ?? "",
-                ImageUrl = p.ImageUrl
+                ImageUrl = p.ImageUrl,
+                IsActive = p.IsActive
             });
             return View(vm);
         }

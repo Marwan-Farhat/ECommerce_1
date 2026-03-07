@@ -19,5 +19,6 @@ namespace ECommerce.BLL.Interfaces
         Task<Order?> GetOrderDetailsAsync(int orderId, string userId);
         Task<IEnumerable<Order>> GetAllOrdersAsync();
         Task UpdateOrderStatusAsync(int orderId, OrderStatus status);
+        Task CancelOrderAsync(int orderId, string userId);
     }
 }

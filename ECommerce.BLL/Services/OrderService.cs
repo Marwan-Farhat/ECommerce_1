@@ -77,6 +77,7 @@ namespace ECommerce.BLL.Services
             => await _unitOfWork.Orders.Query()
                 .Include(o => o.User)
                 .Include(o => o.OrderItems)
+                     .ThenInclude(oi => oi.Product)
                 .Include(o => o.ShippingAddress)
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
@@ -90,6 +91,37 @@ namespace ECommerce.BLL.Services
                 _unitOfWork.Orders.Update(order);
                 await _unitOfWork.SaveChangesAsync();
             }
+        }
+
+        public async Task CancelOrderAsync(int orderId, string userId)
+        {
+                var order = await _unitOfWork.Orders.Query()
+                    .Include(o => o.OrderItems)
+                    .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
+
+                if (order == null)
+                    throw new InvalidOperationException("Order not found.");
+
+                if (order.Status == OrderStatus.Shipped || order.Status == OrderStatus.Delivered)
+                    throw new InvalidOperationException("Cannot cancel a shipped or delivered order.");
+
+                if (order.Status == OrderStatus.Cancelled)
+                    throw new InvalidOperationException("Order is already cancelled.");
+
+                foreach (var item in order.OrderItems)
+                {
+                    var product = await _unitOfWork.Products.GetByIdAsync(item.ProductId);
+                    if (product != null)
+                    {
+                        product.StockQuantity += item.Quantity;
+                        _unitOfWork.Products.Update(product);
+                    }
+                }
+
+                order.Status = OrderStatus.Cancelled;
+                _unitOfWork.Orders.Update(order);
+
+                await _unitOfWork.SaveChangesAsync();
         }
     }
 }

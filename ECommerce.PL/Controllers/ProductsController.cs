@@ -27,7 +27,7 @@ namespace ECommerce.PL.Controllers
             };
 
             var result = await _productService.GetProductsAsync(filters);
-            var categories = await _categoryService.GetAllCategoriesAsync();
+            var categories = await _categoryService.GetActiveCategoriesAsync();
 
             var vm = new ProductListVM
             {

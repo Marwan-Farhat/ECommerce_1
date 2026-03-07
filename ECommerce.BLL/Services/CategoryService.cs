@@ -1,6 +1,7 @@
 using ECommerce.BLL.Interfaces;
 using ECommerce.DAL.Entities;
 using ECommerce.DAL.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.BLL.Services
 {
@@ -13,8 +14,17 @@ namespace ECommerce.BLL.Services
             _unitOfWork = unitOfWork;
         }
 
+        public async Task<IEnumerable<Category>> GetActiveCategoriesAsync()
+        {
+            return await _unitOfWork.Categories.Query()
+                .Where(c => c.IsActive)
+                .ToListAsync();
+        }
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
-            => await _unitOfWork.Categories.FindAsync(c => c.IsActive);
+        {
+            return await _unitOfWork.Categories.Query()
+                .ToListAsync();
+        }
 
         public async Task<Category?> GetCategoryByIdAsync(int id)
             => await _unitOfWork.Categories.GetByIdAsync(id);
