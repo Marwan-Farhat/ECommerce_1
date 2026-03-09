@@ -7,7 +7,6 @@ namespace ECommerce.DAL.Repositories
     public class UnitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _context;
-        private IDbContextTransaction? _transaction;
 
         private IRepository<Category>? _categories;
         private IRepository<Product>? _products;
@@ -41,7 +40,6 @@ namespace ECommerce.DAL.Repositories
 
         public void Dispose()
         {
-            _transaction?.Dispose();
             _context.Dispose();
         }
     }
